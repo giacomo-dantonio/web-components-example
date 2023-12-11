@@ -1,0 +1,52 @@
+<div id="main">
+  <slot name="header"><h1>🧠 Trivia Quiz</h1></slot>
+  <div class="content">
+    <slot name="content"></slot>
+  </div>
+</div>
+
+<style>
+  #main {
+    background-color: #f5f5f5;
+
+    width: 600px;
+    height: 400px;
+    border-radius: 10px;
+    padding: 30px;
+    margin: 0 auto;
+
+
+    position: absolute; /*Can also be `fixed`*/
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    /*Solves a problem in which the content is being cut when the div is smaller than its' wrapper:*/
+    max-width: 100%;
+    max-height: 100%;
+    overflow: auto;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  #main.large {
+    width: 60vw;
+    height: fit-content;
+  }
+
+  .content,
+  .flex-container {
+    flex-grow: 1;
+    flex-direction: column;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  div.content {
+    padding: 20px 0px;
+  }
+</style>
