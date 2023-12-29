@@ -1,11 +1,10 @@
-import template from './base.html?raw';
+import template from './base.html?raw'
 
 class BaseLayout extends HTMLElement {
-  constructor() {
-    super();
-    const shadowRoot = this.attachShadow({ mode: "open" });
-    shadowRoot.innerHTML = template;
+  connectedCallback() {
+    const shadowRoot = this.attachShadow({ mode: "open" })
+    shadowRoot.innerHTML = template
   }
 }
 
-customElements.define("base-layout", BaseLayout);
+customElements.define("base-layout", BaseLayout)
