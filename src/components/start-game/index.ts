@@ -1,3 +1,4 @@
+import { StartSession } from '../../domain/events'
 import template from './start-game.html?raw'
 
 class StartGame extends HTMLElement {
@@ -12,7 +13,25 @@ class StartGame extends HTMLElement {
     const form = shadowRoot.querySelector('form') as HTMLFormElement
     form.onsubmit = ev => {
       ev.preventDefault()
-      console.log('SUBMIT')
+
+      const nameInput = form.querySelector('#name') as HTMLInputElement;
+      const difficultyInput = form.querySelector('#difficulty') as HTMLSelectElement;
+      const categoryInput = form.querySelector('#category') as HTMLSelectElement;
+
+      const detail : StartSession = {
+        player_name: nameInput.value,
+        category: categoryInput.value || undefined,
+        difficulty: difficultyInput.value || undefined
+      }
+
+      const startEvent = new CustomEvent(
+        'start-session',
+        {
+          bubbles: true,
+          composed: true,
+          detail
+        })
+      this.dispatchEvent(startEvent)
     }
 
     this.updateCategories(shadowRoot)
