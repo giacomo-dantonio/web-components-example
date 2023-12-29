@@ -9,9 +9,17 @@
   <body>
     <div id="app">
       <base-layout>
-        <span slot="content">TEST</span>
+        <span slot="content">
+          <start-game></start-game>
+        </span>
       </base-layout>
     </div>
     <script type="module" src="/src/main.ts" defer></script>
   </body>
+
+  <style>
+    span[slot="content"] {
+      width: 100%;
+    }
+  </style>
 </html>

@@ -1,0 +1,66 @@
+<form>
+  <label for="name">Enter your name:</label>
+  <input type="text" id="name" name="name" required>
+  <br>
+
+  <label for="difficulty">Select the difficulty:</label>
+  <select id="difficulty" name="difficulty">
+    <option value="">Any difficulty</option>
+    <option value="easy">Easy</option>
+    <option value="medium">Medium</option>
+    <option value="hard">Hard</option>
+  </select>
+  <br>
+
+  <label for="category">Select the category:</label>
+  <select id="category" name="category">
+    <option value="">Any category</option>
+  </select>
+  <br>
+  <input type="submit" value="Start">
+</form>
+
+<style>
+  form {
+    width: 100%;
+  }
+
+  label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  input[type="text"] {
+    width: calc(100% - 18px);
+  }
+
+  select {
+    width: 100%;
+  }
+
+  input[type="text"],
+  select {
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  select {
+    background-color: #fff;
+  }
+
+  input[type="submit"] {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  input[type="submit"]:hover {
+    background-color: #0056b3;
+  }
+</style>
