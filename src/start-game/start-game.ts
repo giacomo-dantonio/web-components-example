@@ -9,6 +9,12 @@ class StartGame extends HTMLElement {
     const shadowRoot = this.attachShadow({ mode: 'open' })
     shadowRoot.innerHTML = template
 
+    const form = shadowRoot.querySelector('form') as HTMLFormElement
+    form.onsubmit = ev => {
+      ev.preventDefault()
+      console.log('SUBMIT')
+    }
+
     this.updateCategories(shadowRoot)
   }
 
