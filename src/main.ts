@@ -1,2 +1,3 @@
 import './style.css'
-import './base/base.ts'
+import './components'
+import './views'
