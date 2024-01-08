@@ -4,12 +4,18 @@ import Session from '../domain/session';
 import { StartSession } from '../domain/events';
 import { makeOpentdbUrl } from '../utils';
 import { QuestionDto, createQuestions } from '../domain/question';
+import state from '../state';
 
 class App extends HTMLElement {
-  state: Session | undefined
+  state: { props: Session | null }
 
   constructor() {
     super()
+
+    this.state = state(
+      { props: null },
+      (_, oldval, newval) => this.renderView(oldval, newval)
+    )
   }
 
   connectedCallback() {
@@ -24,7 +30,7 @@ class App extends HTMLElement {
       }
     )
 
-    this.renderView()
+    this.renderView(null, null)
   }
 
   async startSession(payload: StartSession) {
@@ -34,26 +40,30 @@ class App extends HTMLElement {
     const results = (await response.json()).results as QuestionDto[]
     const questions = createQuestions(results)
 
-    this.state = {
+    this.state.props = {
       player_name: payload.player_name,
       category: payload.category,
       difficulty: payload.difficulty,
       questions
     }
-
-    this.renderView()
   }
 
-  renderView() {
+  renderView(oldprops: any, newprops: any) {
     const shadow = this.shadowRoot
     const contentDiv = shadow?.querySelector('[slot="content"]')
 
-    if (this.state === undefined) {
+    if (!newprops) {
+      // If there are no props, the start form will be rendered
       const startForm = document.createElement('start-game')
       contentDiv?.replaceChildren(startForm)
     }
     else {
-      console.log(this.state)
+      if (newprops.player_name !== oldprops?.player_name) {
+        const header = shadow?.querySelector('[slot="header"]')
+        if (header) {
+          header.textContent = `⁉️ ${newprops.player_name},`
+        }
+      }
     }
   }
 }

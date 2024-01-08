@@ -1,0 +1,56 @@
+<p><strong>Q:</strong> <span id="question">How many roads must a man walk down?</span> 🤔</p>
+
+<form>
+  <div class="answers">
+  </div>
+</form>
+
+<style>
+form {
+  width: 100%;
+}
+
+label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 5px;
+  background-color: #ccc;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+}
+
+input[type="submit"] {
+  background-color: #007bff;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+input[type="submit"]:hover {
+  background-color: #0056b3;
+}
+
+.answers {
+  display: grid;
+  grid-template-columns: 285px 285px;
+  grid-column-gap: 30px;
+  grid-row-gap: 10px;
+
+  margin-bottom: 20px;
+}
+
+.answers label:has(> input[type="radio"]:checked) {
+  background-color: #007bff;
+}
+
+/* This looks strange but since Firefox doesn't support the :has
+   selector, we want to display the radio button on that, but hide it
+   on all other browsers.
+ */
+.answers label:has(> input[type="radio"]) > input[type="radio"]{
+  display: none;
+}
+</style>

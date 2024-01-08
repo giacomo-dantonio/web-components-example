@@ -2,37 +2,54 @@ import { assert, describe, expect, it } from 'vitest';
 import state from '../src/state';
 
 describe('The State object', () => {
-  it('will set initial values on its target object', () => {
-    const div = document.createElement("div");
-
+  it('will return the initial value if no changes have been made', () => {
     const initial = {
-      "hello": "old",
-      "world": "old"
+      'hello': 'old',
+      'world': 'old'
     };
-    const props = Object.keys(initial);
 
-    const _state = state(div, initial);
-    for (const prop of props) {
-      expect(div.getAttribute(prop)).toBe("old");
-    }
-  });
+    const props = state(initial, () => {});
 
-  it('will set new values on its target object', () => {
-    const div = document.createElement("div");
+    expect(props['hello']).toBe('old')
+    expect(props['world']).toBe('old')
+  })
 
+  it('will call the callback if a change has been made', () => {
     const initial = {
-      "hello": "old",
-      "world": "old"
+      'hello': 'old',
+      'world': 'old'
     };
-    const props = Object.keys(initial);
 
-    const divState = state(div, initial);
-    for (const prop of props) {
-      divState[prop] = "new";
+    interface Change {
+      prop: string | symbol,
+      oldval: any,
+      newval: any
     }
 
-    for (const prop of props) {
-      expect(div.getAttribute(prop)).toBe("new");
-    }
-  });
+    const changes: Change[] = []
+    const props = state(initial, (prop, oldval, newval) => {
+      changes.push({ prop, oldval, newval })
+    });
+
+    props['hello'] = 'new1'
+    props['world'] = 'new2'
+
+    expect(changes[0]).toEqual({ prop: 'hello', oldval: 'old', newval: 'new1' })
+    expect(changes[1]).toEqual({ prop: 'world', oldval: 'old', newval: 'new2' })
+  })
+
+  it('will return the changed value if changes have been made', () => {
+    const initial = {
+      'hello': 'old',
+      'world': 'old'
+    };
+
+    const props = state(initial, () => {});
+
+    props['hello'] = 'new1'
+    props['world'] = 'new2'
+
+    expect(props['hello']).toBe('new1')
+    expect(props['world']).toBe('new2')
+  })
 });

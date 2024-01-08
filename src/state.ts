@@ -1,23 +1,24 @@
 /* This class models the state of a web component.
  * 
  */
-export default function state<T extends object>(el: HTMLElement, initial: T) : T {
-    const props = Object.keys(initial);
+export default function state<T extends object>(initial: T, callback: (prop: string | null, oldval: any, newval: any) => void): T {
+    const props = { ...initial }
 
-    // Set initial values on the element
-    for (const prop of props) {
-      // @ts-ignore
-      el.setAttribute(prop.toString(), initial[prop]);
-    }
-
-    const value = new Proxy(initial, {
+    const value = new Proxy(props, {
       set(_obj, prop, newval) {
-        if (props.includes(prop.toString())) {
-          el.setAttribute(prop.toString(), newval);
-        }
-  
+        // @ts-ignore
+        const oldval: any = props[prop]
+        callback(prop.toString(), oldval, newval)
+
+        // @ts-ignore
+        props[prop] = newval
+
         // Indicate success
         return true;
+      },
+      get(_target, prop, _receiver) {
+        // @ts-ignore
+        return props[prop.toString()]
       },
     });
 
