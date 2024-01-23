@@ -53,7 +53,7 @@ export default class QuestionForm extends HTMLElement {
         input.setAttribute("required", "true")
 
         const text = document.createElement("span")
-        text.textContent = answer
+        text.textContent = htmlDecode(answer)
 
         const label = document.createElement("label")
         label.appendChild(input)

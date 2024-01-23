@@ -83,7 +83,7 @@ class App extends HTMLElement {
         const footer = shadow?.querySelector('[slot="footer"]')
         if (footer) {
           footer.textContent = `This is your ${questionNr(newprops.active_question)} question / ` +
-            `${htmlDecode(question.category)} / ${capitalize(question.difficulty)}`
+            `${htmlDecode(question.category)} / ${capitalize(question.difficulty)} /`
         }
       }
     }
