@@ -5,6 +5,7 @@ import { StartSession } from '../domain/events';
 import { makeOpentdbUrl } from '../utils';
 import { QuestionDto, createQuestions } from '../domain/question';
 import state from '../state';
+import QuestionForm from '../components/question';
 
 class App extends HTMLElement {
   state: { props: Session | null }
@@ -44,11 +45,12 @@ class App extends HTMLElement {
       player_name: payload.player_name,
       category: payload.category,
       difficulty: payload.difficulty,
+      active_question: 0,
       questions
     }
   }
 
-  renderView(oldprops: any, newprops: any) {
+  renderView(oldprops: Session | null, newprops: Session | null) {
     const shadow = this.shadowRoot
     const contentDiv = shadow?.querySelector('[slot="content"]')
 
@@ -62,6 +64,20 @@ class App extends HTMLElement {
         const header = shadow?.querySelector('[slot="header"]')
         if (header) {
           header.textContent = `⁉️ ${newprops.player_name},`
+        }
+      }
+
+      if (newprops.active_question != oldprops?.active_question) {
+        const question = newprops.questions[newprops.active_question]
+        if (question !== undefined) {
+          const questionForm = document.createElement("question-form") as QuestionForm
+          questionForm.state.props = {
+            question: question.question,
+            answers: question.answers
+          }
+
+          const content = shadow?.querySelector('[slot="content"]')
+          content?.replaceChildren(questionForm)
         }
       }
     }

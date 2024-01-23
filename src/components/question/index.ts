@@ -6,7 +6,15 @@ interface QuestionProps {
   answers: string[],
 }
 
-class QuestionForm extends HTMLElement {
+// from this: https://stackoverflow.com/a/1912522
+function htmlDecode(input: string): string | null {
+  var e = document.createElement('textarea');
+  e.innerHTML = input;
+  // handle case of empty input
+  return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
+}
+
+export default class QuestionForm extends HTMLElement {
   state: { props: QuestionProps | null }
 
   constructor() {
@@ -26,7 +34,7 @@ class QuestionForm extends HTMLElement {
     this.renderView(null, props)
   }
 
-  renderView(oldval: QuestionProps | null, newval: QuestionProps | null): void {
+  renderView(_oldval: QuestionProps | null, newval: QuestionProps | null): void {
     const shadow = this.shadowRoot
     const container = shadow?.querySelector('div.answers')
     if (!shadow || ! container) {
@@ -40,11 +48,11 @@ class QuestionForm extends HTMLElement {
     } else {
       const questionSpan = shadow.querySelector("#question")
       if (questionSpan) {
-        questionSpan.textContent = newval.question
+        questionSpan.textContent = htmlDecode(newval.question)
       }
 
       const children = []
-      for (const answer in newval.answers) {
+      for (const answer of newval.answers) {
         const input = document.createElement("input")
         input.setAttribute("type", "radio")
         input.setAttribute("name", "answer")
