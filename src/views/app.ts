@@ -2,7 +2,7 @@ import template from './app.html?raw';
 
 import Session from '../domain/session';
 import { StartSession } from '../domain/events';
-import { makeOpentdbUrl } from '../utils';
+import { capitalize, htmlDecode, makeOpentdbUrl, questionNr } from '../utils';
 import { QuestionDto, createQuestions } from '../domain/question';
 import state from '../state';
 import QuestionForm from '../components/question';
@@ -78,6 +78,12 @@ class App extends HTMLElement {
 
           const content = shadow?.querySelector('[slot="content"]')
           content?.replaceChildren(questionForm)
+        }
+
+        const footer = shadow?.querySelector('[slot="footer"]')
+        if (footer) {
+          footer.textContent = `This is your ${questionNr(newprops.active_question)} question / ` +
+            `${htmlDecode(question.category)} / ${capitalize(question.difficulty)}`
         }
       }
     }

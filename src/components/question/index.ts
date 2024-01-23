@@ -1,17 +1,10 @@
 import state from '../../state'
+import { htmlDecode } from '../../utils'
 import template from './question.html?raw'
 
 interface QuestionProps {
   question: string,
   answers: string[],
-}
-
-// from this: https://stackoverflow.com/a/1912522
-function htmlDecode(input: string): string | null {
-  var e = document.createElement('textarea');
-  e.innerHTML = input;
-  // handle case of empty input
-  return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
 }
 
 export default class QuestionForm extends HTMLElement {
