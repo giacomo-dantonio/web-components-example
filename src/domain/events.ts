@@ -3,3 +3,7 @@ export interface StartSession {
   category: string | undefined,
   difficulty: string | undefined,
 }
+
+export interface AnswerQuestion {
+  answer: string
+}

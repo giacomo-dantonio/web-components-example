@@ -1,7 +1,7 @@
 import template from './app.html?raw';
 
 import Session from '../domain/session';
-import { StartSession } from '../domain/events';
+import { AnswerQuestion, StartSession } from '../domain/events';
 import { capitalize, htmlDecode, makeOpentdbUrl, questionNr } from '../utils';
 import { QuestionDto, createQuestions } from '../domain/question';
 import state from '../state';
@@ -31,6 +31,14 @@ class App extends HTMLElement {
       }
     )
 
+    this.addEventListener(
+      'answer-question',
+      ev => {
+        const payload = (ev as CustomEvent).detail as AnswerQuestion
+        this.answerActiveQuestion(payload.answer)
+      }
+    )
+
     this.renderView(null, null)
   }
 
@@ -47,6 +55,22 @@ class App extends HTMLElement {
       difficulty: payload.difficulty,
       active_question: 0,
       questions
+    }
+  }
+
+  answerActiveQuestion(answer: string) {
+    if (this.state.props !== null) {
+      const { active_question, questions } = this.state.props
+
+      questions[active_question]["player_answer"] = answer
+
+      // FIXME: this moves to the next question.
+      // Instead the answer page should be shown.
+      this.state.props = {
+        ...this.state.props,
+        active_question: Math.min(active_question + 1, questions.length - 1),
+        questions
+      }
     }
   }
 

@@ -1,3 +1,4 @@
+import { AnswerQuestion } from '../../domain/events'
 import state from '../../state'
 import { htmlDecode } from '../../utils'
 import template from './question.html?raw'
@@ -22,6 +23,30 @@ export default class QuestionForm extends HTMLElement {
   connectedCallback() {
     const shadowRoot = this.attachShadow({ mode: 'open' })
     shadowRoot.innerHTML = template
+
+    const form = shadowRoot.querySelector('form') as HTMLFormElement
+    form.onsubmit = ev => {
+      ev.preventDefault()
+
+      const data = new FormData(form)
+      const answer = data.get('answer')
+
+      if (answer !== null) {
+        const detail: AnswerQuestion = { answer: answer as string }
+
+        const answerEvent = new CustomEvent(
+          'answer-question',
+          {
+            bubbles: true,
+            composed: true,
+            detail
+          }
+        )
+        this.dispatchEvent(answerEvent)
+      } else {
+        console.error('No answer provided.')
+      }
+    }
 
     const { props } = this.state
     this.renderView(null, props)
