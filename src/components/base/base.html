@@ -1,14 +1,14 @@
 <div id="main">
-  <slot name="header"><h1>🧠 Trivia Quiz</h1></slot>
+  <slot name="header"></slot>
   <div class="content">
     <slot name="content"></slot>
   </div>
-  <small>
+  <div>
     <slot name="footer">
-      <a href="#">Score Board</a> /
-      Powered by <a href="https://opentdb.com/">Open Trivia Database</a>
+      <a href="#">Score Board</a>
     </slot>
-  </small>
+    <small>Powered by <a href="https://opentdb.com/">Open Trivia Database</a></small>
+  </div>
 </div>
 
 <style>
