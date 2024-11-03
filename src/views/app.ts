@@ -6,6 +6,7 @@ import { capitalize, htmlDecode, makeOpentdbUrl, questionNr } from '../utils';
 import { QuestionDto, createQuestions } from '../domain/question';
 import state from '../state';
 import QuestionForm from '../components/question';
+import QuestionAnswer from '../components/answer'
 
 class App extends HTMLElement {
   state: { props: Session | null }
@@ -39,6 +40,8 @@ class App extends HTMLElement {
       }
     )
 
+    this.addEventListener('next-question', _ => this.moveToNextQuestion())
+
     this.renderView(null, null)
   }
 
@@ -64,12 +67,19 @@ class App extends HTMLElement {
 
       questions[active_question]["player_answer"] = answer
 
-      // FIXME: this moves to the next question.
-      // Instead the answer page should be shown.
+      this.state.props = {
+        ...this.state.props,
+        questions
+      }
+    }
+  }
+
+  moveToNextQuestion() {
+    if (this.state.props !== null) {
+      const { active_question, questions } = this.state.props
       this.state.props = {
         ...this.state.props,
         active_question: Math.min(active_question + 1, questions.length - 1),
-        questions
       }
     }
   }
@@ -77,6 +87,11 @@ class App extends HTMLElement {
   renderView(oldprops: Session | null, newprops: Session | null) {
     const shadow = this.shadowRoot
     const contentDiv = shadow?.querySelector('[slot="content"]')
+
+    const showAnswer = (props: Session) => {
+      const {active_question, questions} = props
+      return questions[active_question]?.player_answer !== undefined
+    }
 
     if (!newprops) {
       // If there are no props, the start form will be rendered
@@ -109,6 +124,18 @@ class App extends HTMLElement {
           footer.textContent = `This is your ${questionNr(newprops.active_question)} question / ` +
             `${htmlDecode(question.category)} / ${capitalize(question.difficulty)} /`
         }
+      }
+      else if (showAnswer(newprops)) {
+        const question = newprops.questions[newprops.active_question]
+
+        const questionAnswer = document.createElement("question-answer") as QuestionAnswer
+        questionAnswer.state.props = {
+          last: newprops.active_question === newprops.questions.length - 1,
+          question
+        }
+
+        const content = shadow?.querySelector('[slot="content"]')
+        content?.replaceChildren(questionAnswer)
       }
     }
   }

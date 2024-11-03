@@ -1,3 +1,4 @@
+import './answer'
 import './base'
-import './start-game'
 import './question'
+import './start-game'

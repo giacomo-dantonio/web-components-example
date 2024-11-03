@@ -43,3 +43,7 @@ export function createQuestions(dtos: QuestionDto[]) : Question[] {
   }
   return questions
 }
+
+export function isCorrect(question: Question) : boolean {
+  return question.player_answer === question.correct_answer
+}
