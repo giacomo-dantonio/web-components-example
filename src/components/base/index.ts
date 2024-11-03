@@ -1,4 +1,4 @@
-import template from './base.html?raw'
+import template from "./base.html?raw"
 
 class BaseLayout extends HTMLElement {
   connectedCallback() {

@@ -1,11 +1,11 @@
-import Question, { isCorrect } from '../../domain/question'
-import state from '../../state'
-import { htmlDecode } from '../../utils'
-import template from './answer.html?raw'
+import Question, { isCorrect } from "../../domain/question"
+import state from "../../state"
+import { htmlDecode } from "../../utils"
+import template from "./answer.html?raw"
 
 interface AnswerProps {
-  last: boolean,
-  question: Question,
+  last: boolean
+  question: Question
 }
 
 export default class QuestionAnswer extends HTMLElement {
@@ -16,30 +16,25 @@ export default class QuestionAnswer extends HTMLElement {
   constructor() {
     super()
 
-    this.state = state(
-      { props: null },
-      (_, oldval, newval) => this.renderView(oldval, newval)
+    this.state = state({ props: null }, (_, oldval, newval) =>
+      this.renderView(oldval, newval),
     )
   }
 
   connectedCallback() {
-    const shadowRoot = this.attachShadow({ mode: 'open' })
+    const shadowRoot = this.attachShadow({ mode: "open" })
     shadowRoot.innerHTML = template
 
-    const form = shadowRoot.querySelector('form') as HTMLFormElement
-    form.onsubmit = ev => {
+    const form = shadowRoot.querySelector("form") as HTMLFormElement
+    form.onsubmit = (ev) => {
       ev.preventDefault()
 
-      const nextEvent = new CustomEvent(
-        'next-question',
-        {
-          bubbles: true,
-          composed: true,
-        }
-      )
+      const nextEvent = new CustomEvent("next-question", {
+        bubbles: true,
+        composed: true,
+      })
       this.dispatchEvent(nextEvent)
     }
-
 
     const { props } = this.state
     this.renderView(null, props)
@@ -50,33 +45,37 @@ export default class QuestionAnswer extends HTMLElement {
       const { question } = newval
 
       const shadow = this.shadowRoot
-      const correct = shadow?.querySelector('p#answer-correct')
+      const correct = shadow?.querySelector("p#answer-correct")
       if (correct) {
         correct.textContent = isCorrect(question)
-          ? 'Congratulations, your answer is correct 🥳'
-          : 'Sorry, your answer is wrong 😞'
+          ? "Congratulations, your answer is correct 🥳"
+          : "Sorry, your answer is wrong 😞"
       }
 
-      const playerText = shadow?.querySelector('p#player-answer .answer-text')
+      const playerText = shadow?.querySelector("p#player-answer .answer-text")
       if (playerText) {
-        playerText.textContent = htmlDecode(question.player_answer ?? '')
+        playerText.textContent = htmlDecode(question.player_answer ?? "")
       }
 
-      const correctAnswer = shadow?.querySelector('p#correct-answer') as (HTMLElement | null)
-      const correctText = shadow?.querySelector('p#correct-answer .answer-text')
+      const correctAnswer = shadow?.querySelector(
+        "p#correct-answer",
+      ) as HTMLElement | null
+      const correctText = shadow?.querySelector("p#correct-answer .answer-text")
       if (isCorrect(question) && correctAnswer) {
-        correctAnswer.style.display = 'none'
-      }
-      else if (!isCorrect(question) && correctText) {
+        correctAnswer.style.display = "none"
+      } else if (!isCorrect(question) && correctText) {
         correctText.textContent = htmlDecode(question.correct_answer)
       }
 
-      const submitButton = shadow?.querySelector('input#submit')
+      const submitButton = shadow?.querySelector("input#submit")
       if (submitButton) {
-        submitButton.setAttribute('value', newval.last ? 'Game finished' : 'Next question >>')
+        submitButton.setAttribute(
+          "value",
+          newval.last ? "Game finished" : "Next question >>",
+        )
       }
     }
   }
 }
 
-customElements.define("question-answer", QuestionAnswer);
+customElements.define("question-answer", QuestionAnswer)
