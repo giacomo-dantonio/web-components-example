@@ -3,7 +3,7 @@ import template from './app.html?raw';
 import Session from '../domain/session';
 import { AnswerQuestion, StartSession } from '../domain/events';
 import { capitalize, htmlDecode, makeOpentdbUrl, questionNr } from '../utils';
-import { QuestionDto, createQuestions } from '../domain/question';
+import { QuestionDto, createQuestions, isCorrect } from '../domain/question';
 import state from '../state';
 import QuestionForm from '../components/question';
 import QuestionAnswer from '../components/answer'
@@ -106,6 +106,7 @@ class App extends HTMLElement {
         }
       }
 
+      const background = shadow?.querySelector("#bg")
       if (newprops.active_question != oldprops?.active_question) {
         const question = newprops.questions[newprops.active_question]
         if (question !== undefined) {
@@ -124,6 +125,10 @@ class App extends HTMLElement {
           footer.textContent = `This is your ${questionNr(newprops.active_question)} question / ` +
             `${htmlDecode(question.category)} / ${capitalize(question.difficulty)} /`
         }
+
+        if (background) {
+          background.className = ""
+        }
       }
       else if (showAnswer(newprops)) {
         const question = newprops.questions[newprops.active_question]
@@ -136,6 +141,10 @@ class App extends HTMLElement {
 
         const content = shadow?.querySelector('[slot="content"]')
         content?.replaceChildren(questionAnswer)
+
+        if (background) {
+          background.className = isCorrect(question) ? "correct" : "wrong"
+        }
       }
     }
   }
