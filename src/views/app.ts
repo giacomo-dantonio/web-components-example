@@ -1,12 +1,13 @@
 import template from "./app.html?raw"
 
-import Session from "../domain/session"
+import Session, { isLast } from "../domain/session"
 import { AnswerQuestion, StartSession } from "../domain/events"
-import { capitalize, htmlDecode, makeOpentdbUrl, questionNr } from "../utils"
-import { QuestionDto, createQuestions, isCorrect } from "../domain/question"
+import { capitalize, htmlDecode, interpolateColor, makeOpentdbUrl, questionNr } from "../utils"
+import { QuestionDto, createQuestions, isCorrect, percentScore } from "../domain/question"
 import state from "../state"
 import QuestionForm from "../components/question"
 import QuestionAnswer from "../components/answer"
+import GameSummary from "../components/summary"
 
 class App extends HTMLElement {
   state: { props: Session | null }
@@ -46,10 +47,11 @@ class App extends HTMLElement {
     const questions = createQuestions(results)
 
     this.state.props = {
-      player_name: payload.player_name,
+      active_question: 0,
       category: payload.category,
       difficulty: payload.difficulty,
-      active_question: 0,
+      over: false,
+      player_name: payload.player_name,
       questions,
     }
   }
@@ -73,6 +75,7 @@ class App extends HTMLElement {
       this.state.props = {
         ...this.state.props,
         active_question: Math.min(active_question + 1, questions.length - 1),
+        over: isLast(this.state.props)
       }
     }
   }
@@ -99,7 +102,20 @@ class App extends HTMLElement {
       }
 
       const background = shadow?.querySelector("#bg")
-      if (newprops.active_question != oldprops?.active_question) {
+      if (newprops.over) {
+        // set background color
+        const score = percentScore(newprops.questions);
+        const bgColor = interpolateColor(0xff0000, 0x00ff00, score)
+        shadow
+          ?.querySelector("#bg")
+          ?.setAttribute("style", `background-color: #${bgColor}`)
+
+        // render summary
+        const summary = document.createElement("game-summary") as GameSummary
+        summary.state.props = newprops
+
+        contentDiv?.replaceChildren(summary)
+        } else if (newprops.active_question != oldprops?.active_question) {
         const question = newprops.questions[newprops.active_question]
         if (question !== undefined) {
           const questionForm = document.createElement(
@@ -131,7 +147,7 @@ class App extends HTMLElement {
           "question-answer",
         ) as QuestionAnswer
         questionAnswer.state.props = {
-          last: newprops.active_question === newprops.questions.length - 1,
+          last: isLast(newprops),
           question,
         }
 

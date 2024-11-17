@@ -47,3 +47,14 @@ export function createQuestions(dtos: QuestionDto[]): Question[] {
 export function isCorrect(question: Question): boolean {
   return question.player_answer === question.correct_answer
 }
+
+// Compute the percent value of the questions answered correctly
+export function percentScore(questions: Question[]): number {
+  const noCorrect = questions.reduce(
+    (partialScore, question) =>
+      isCorrect(question) ? partialScore + 1 : partialScore,
+    0
+  );
+
+  return noCorrect * 100 / questions.length;
+}

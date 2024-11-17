@@ -42,3 +42,7 @@ export function questionNr(index: number): string {
 export function capitalize(text: string): string {
   return text && text[0].toUpperCase() + text.slice(1)
 }
+
+export function interpolateColor(colorA: number, colorB: number, percent: number) {
+  return (colorA + (colorB - colorA) * percent / 100).toString(16);
+}
