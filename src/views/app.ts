@@ -129,6 +129,8 @@ class App extends HTMLElement {
         summary.state.props = newprops
 
         contentDiv?.replaceChildren(summary)
+
+        shadow?.querySelector("base-layout")?.setAttribute("large", "")
       } else if (newprops.active_question != oldprops?.active_question) {
         const question = newprops.questions[newprops.active_question]
         if (question !== undefined) {

@@ -1,4 +1,4 @@
-export const N_QUESTIONS = 3
+export const N_QUESTIONS = 10
 
 export function makeOpentdbUrl(
   category: string | undefined,
