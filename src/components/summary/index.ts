@@ -1,5 +1,6 @@
 import Question, { isCorrect, percentScore } from "../../domain/question"
 import state from "../../state"
+import { htmlDecode } from "../../utils"
 import template from "./summary.html?raw"
 
 interface SummaryProps {
@@ -54,7 +55,7 @@ export default class GameSummary extends HTMLElement {
           ]
           for (const content of cellsContent) {
             const cell = document.createElement("td")
-            cell.textContent = content
+            cell.textContent = htmlDecode(content)
             row.appendChild(cell)
           }
 
