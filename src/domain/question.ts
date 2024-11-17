@@ -1,24 +1,24 @@
 export default interface Question {
-  question: string,
-  index: number,
-  category: string,
-  type: string,
-  difficulty: string,
-  correct_answer: string,
-  player_answer: string | undefined,
+  question: string
+  index: number
+  category: string
+  type: string
+  difficulty: string
+  correct_answer: string
+  player_answer: string | undefined
   answers: string[]
 }
 
 export interface QuestionDto {
-  category: string,
-  correct_answer: string,
-  difficulty: string,
-  incorrect_answers: string[],
-  question: string,
-  type: string,
+  category: string
+  correct_answer: string
+  difficulty: string
+  incorrect_answers: string[]
+  question: string
+  type: string
 }
 
-function createQuestion(index: number, dto: QuestionDto) : Question {
+function createQuestion(index: number, dto: QuestionDto): Question {
   const answers = [dto.correct_answer].concat(dto.incorrect_answers)
 
   // shuffle answers array
@@ -36,10 +36,25 @@ function createQuestion(index: number, dto: QuestionDto) : Question {
   }
 }
 
-export function createQuestions(dtos: QuestionDto[]) : Question[] {
+export function createQuestions(dtos: QuestionDto[]): Question[] {
   const questions = []
   for (let index = 0; index < dtos.length; index++) {
     questions.push(createQuestion(index, dtos[index]))
   }
   return questions
+}
+
+export function isCorrect(question: Question): boolean {
+  return question.player_answer === question.correct_answer
+}
+
+// Compute the percent value of the questions answered correctly
+export function percentScore(questions: Question[]): number {
+  const noCorrect = questions.reduce(
+    (partialScore, question) =>
+      isCorrect(question) ? partialScore + 1 : partialScore,
+    0,
+  )
+
+  return (noCorrect * 100) / questions.length
 }

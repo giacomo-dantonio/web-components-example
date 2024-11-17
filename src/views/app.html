@@ -1,8 +1,8 @@
+<div id="bg"></div>
 <div id="app">
   <base-layout>
     <h1 slot="header">🧠 Trivia Quiz</h1>
-    <span slot="content">
-    </span>
+    <span slot="content"> </span>
     <small slot="footer"></small>
   </base-layout>
 </div>
@@ -10,5 +10,22 @@
 <style>
   span[slot="content"] {
     width: 100%;
+  }
+
+  #bg {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image: linear-gradient(to bottom right, darkorange, white);
+    overflow: hidden;
+  }
+
+  #bg.correct {
+    background-image: linear-gradient(to bottom right, green, white);
+  }
+  #bg.wrong {
+    background-image: linear-gradient(to bottom right, red, white);
   }
 </style>

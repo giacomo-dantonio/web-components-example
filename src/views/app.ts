@@ -1,11 +1,24 @@
-import template from './app.html?raw';
+import template from "./app.html?raw"
 
-import Session from '../domain/session';
-import { StartSession } from '../domain/events';
-import { capitalize, htmlDecode, makeOpentdbUrl, questionNr } from '../utils';
-import { QuestionDto, createQuestions } from '../domain/question';
-import state from '../state';
-import QuestionForm from '../components/question';
+import Session, { isLast } from "../domain/session"
+import { AnswerQuestion, StartSession } from "../domain/events"
+import {
+  capitalize,
+  htmlDecode,
+  interpolateColor,
+  makeOpentdbUrl,
+  questionNr,
+} from "../utils"
+import {
+  QuestionDto,
+  createQuestions,
+  isCorrect,
+  percentScore,
+} from "../domain/question"
+import state from "../state"
+import QuestionForm from "../components/question"
+import QuestionAnswer from "../components/answer"
+import GameSummary from "../components/summary"
 
 class App extends HTMLElement {
   state: { props: Session | null }
@@ -13,23 +26,26 @@ class App extends HTMLElement {
   constructor() {
     super()
 
-    this.state = state(
-      { props: null },
-      (_, oldval, newval) => this.renderView(oldval, newval)
+    this.state = state({ props: null }, (_, oldval, newval) =>
+      this.renderView(oldval, newval),
     )
   }
 
   connectedCallback() {
-    const shadowRoot = this.attachShadow({ mode: 'open' })
+    const shadowRoot = this.attachShadow({ mode: "open" })
     shadowRoot.innerHTML = template
 
-    this.addEventListener(
-      'start-session',
-      ev => {
-        const payload = (ev as CustomEvent).detail as StartSession
-        this.startSession(payload)
-      }
-    )
+    this.addEventListener("start-session", (ev) => {
+      const payload = (ev as CustomEvent).detail as StartSession
+      this.startSession(payload)
+    })
+
+    this.addEventListener("answer-question", (ev) => {
+      const payload = (ev as CustomEvent).detail as AnswerQuestion
+      this.answerActiveQuestion(payload.answer)
+    })
+
+    this.addEventListener("next-question", (_) => this.moveToNextQuestion())
 
     this.renderView(null, null)
   }
@@ -42,11 +58,36 @@ class App extends HTMLElement {
     const questions = createQuestions(results)
 
     this.state.props = {
-      player_name: payload.player_name,
+      active_question: 0,
       category: payload.category,
       difficulty: payload.difficulty,
-      active_question: 0,
-      questions
+      over: false,
+      player_name: payload.player_name,
+      questions,
+    }
+  }
+
+  answerActiveQuestion(answer: string) {
+    if (this.state.props !== null) {
+      const { active_question, questions } = this.state.props
+
+      questions[active_question]["player_answer"] = answer
+
+      this.state.props = {
+        ...this.state.props,
+        questions,
+      }
+    }
+  }
+
+  moveToNextQuestion() {
+    if (this.state.props !== null) {
+      const { active_question, questions } = this.state.props
+      this.state.props = {
+        ...this.state.props,
+        active_question: Math.min(active_question + 1, questions.length - 1),
+        over: isLast(this.state.props),
+      }
     }
   }
 
@@ -54,12 +95,16 @@ class App extends HTMLElement {
     const shadow = this.shadowRoot
     const contentDiv = shadow?.querySelector('[slot="content"]')
 
+    const showAnswer = (props: Session) => {
+      const { active_question, questions } = props
+      return questions[active_question]?.player_answer !== undefined
+    }
+
     if (!newprops) {
       // If there are no props, the start form will be rendered
-      const startForm = document.createElement('start-game')
+      const startForm = document.createElement("start-game")
       contentDiv?.replaceChildren(startForm)
-    }
-    else {
+    } else {
       if (newprops.player_name !== oldprops?.player_name) {
         const header = shadow?.querySelector('[slot="header"]')
         if (header) {
@@ -67,13 +112,34 @@ class App extends HTMLElement {
         }
       }
 
-      if (newprops.active_question != oldprops?.active_question) {
+      const background = shadow?.querySelector("#bg")
+      if (newprops.over) {
+        // set background color
+        const score = percentScore(newprops.questions)
+        const bgColor = interpolateColor(0xff0000, 0x00ff00, score)
+        const background = shadow?.querySelector("#bg")
+        background?.classList.remove("correct", "wrong")
+        background?.setAttribute(
+          "style",
+          `background-image: linear-gradient(to bottom right, #${bgColor}, white);`,
+        )
+
+        // render summary
+        const summary = document.createElement("game-summary") as GameSummary
+        summary.state.props = newprops
+
+        contentDiv?.replaceChildren(summary)
+
+        shadow?.querySelector("base-layout")?.setAttribute("large", "")
+      } else if (newprops.active_question != oldprops?.active_question) {
         const question = newprops.questions[newprops.active_question]
         if (question !== undefined) {
-          const questionForm = document.createElement("question-form") as QuestionForm
+          const questionForm = document.createElement(
+            "question-form",
+          ) as QuestionForm
           questionForm.state.props = {
             question: question.question,
-            answers: question.answers
+            answers: question.answers,
           }
 
           const content = shadow?.querySelector('[slot="content"]')
@@ -82,12 +148,34 @@ class App extends HTMLElement {
 
         const footer = shadow?.querySelector('[slot="footer"]')
         if (footer) {
-          footer.textContent = `This is your ${questionNr(newprops.active_question)} question / ` +
+          footer.textContent =
+            `This is your ${questionNr(newprops.active_question)} question / ` +
             `${htmlDecode(question.category)} / ${capitalize(question.difficulty)} /`
+        }
+
+        if (background) {
+          background.className = ""
+        }
+      } else if (showAnswer(newprops)) {
+        const question = newprops.questions[newprops.active_question]
+
+        const questionAnswer = document.createElement(
+          "question-answer",
+        ) as QuestionAnswer
+        questionAnswer.state.props = {
+          last: isLast(newprops),
+          question,
+        }
+
+        const content = shadow?.querySelector('[slot="content"]')
+        content?.replaceChildren(questionAnswer)
+
+        if (background) {
+          background.className = isCorrect(question) ? "correct" : "wrong"
         }
       }
     }
   }
 }
 
-customElements.define("trivia-app", App);
+customElements.define("trivia-app", App)

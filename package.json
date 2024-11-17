@@ -4,15 +4,24 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
     "build": "tsc && vite build",
+    "dev": "vite",
+    "format": "prettier --write .",
+    "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest"
   },
   "devDependencies": {
-    "jsdom": "^23.0.1",
-    "typescript": "^5.2.2",
-    "vite": "^5.0.0",
-    "vitest": "^1.0.4"
+    "@eslint/eslintrc": "^3.2.0",
+    "@eslint/js": "^9.15.0",
+    "eslint": "^9.15.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "globals": "^15.12.0",
+    "jsdom": "^25.0.1",
+    "prettier": "^3.3.3",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11",
+    "vitest": "^2.1.5"
   }
 }
