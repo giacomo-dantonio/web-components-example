@@ -28,38 +28,40 @@ export default class GameSummary extends HTMLElement {
   renderView(_oldval: SummaryProps | null, newval: SummaryProps | null): void {
     if (this.shadowRoot && newval) {
       // Add score
-      const { questions } = newval;
+      const { questions } = newval
 
-      const scorEl = this.shadowRoot.querySelector("#score");
+      const scorEl = this.shadowRoot.querySelector("#score")
       if (scorEl) {
-        const score = percentScore(questions);
-        scorEl.textContent = `${score}%`;
+        const score = percentScore(questions).toLocaleString("en-US", {
+          maximumFractionDigits: 2,
+        })
+        scorEl.textContent = `${score}%`
       }
 
       // Populate table
-      const table = this.shadowRoot.querySelector("table.recap");
-      const tableBody = this.shadowRoot.querySelector("table.recap tbody");
+      const table = this.shadowRoot.querySelector("table.recap")
+      const tableBody = this.shadowRoot.querySelector("table.recap tbody")
       if (tableBody) {
-        const newBody = document.createElement("tbody");
+        const newBody = document.createElement("tbody")
         for (const question of questions) {
-          const row = document.createElement("tr");
+          const row = document.createElement("tr")
 
           const cellsContent = [
             question.question,
             question.player_answer ?? "",
             question.correct_answer,
-            isCorrect(question) ? '👌' : '😔'
+            isCorrect(question) ? "👌" : "😔",
           ]
           for (const content of cellsContent) {
             const cell = document.createElement("td")
-            cell.textContent = content;
-            row.appendChild(cell);
+            cell.textContent = content
+            row.appendChild(cell)
           }
 
           newBody.appendChild(row)
         }
 
-        table?.replaceChild(newBody, tableBody);
+        table?.replaceChild(newBody, tableBody)
       }
     }
   }

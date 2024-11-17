@@ -1,4 +1,4 @@
-export const N_QUESTIONS = 10
+export const N_QUESTIONS = 3
 
 export function makeOpentdbUrl(
   category: string | undefined,
@@ -43,6 +43,23 @@ export function capitalize(text: string): string {
   return text && text[0].toUpperCase() + text.slice(1)
 }
 
-export function interpolateColor(colorA: number, colorB: number, percent: number) {
-  return (colorA + (colorB - colorA) * percent / 100).toString(16);
+export function interpolateColor(
+  colorA: number,
+  colorB: number,
+  percent: number,
+) {
+  const redA = colorA & 0xff0000
+  const greenA = colorA & 0x00ff00
+  const blueA = colorA & 0x0000ff
+  const redB = colorB & 0xff0000
+  const greenB = colorB & 0x00ff00
+  const blueB = colorB & 0x0000ff
+
+  const factor = percent / 100
+  const redC = (redA + (redB - redA) * factor) & 0xff0000
+  const greenC = (greenA + (greenB - greenA) * factor) & 0x00ff00
+  const blueC = (blueA + (blueB - blueA) * factor) & 0x0000ff
+
+  const result = (redC | greenC | blueC).toString(16)
+  return result
 }

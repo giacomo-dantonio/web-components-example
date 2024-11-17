@@ -1,7 +1,7 @@
 import template from "./base.html?raw"
 
 class BaseLayout extends HTMLElement {
-  static observedAttributes = ["large"];
+  static observedAttributes = ["large"]
 
   connectedCallback() {
     const shadowRoot = this.attachShadow({ mode: "open" })
@@ -21,7 +21,7 @@ class BaseLayout extends HTMLElement {
 
     const main = shadow?.querySelector("#main")
     if (main) {
-      main.className = (this.getAttribute("large") !== null) ? "large": ""
+      main.className = this.getAttribute("large") !== null ? "large" : ""
     }
   }
 }

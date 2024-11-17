@@ -53,8 +53,8 @@ export function percentScore(questions: Question[]): number {
   const noCorrect = questions.reduce(
     (partialScore, question) =>
       isCorrect(question) ? partialScore + 1 : partialScore,
-    0
-  );
+    0,
+  )
 
-  return noCorrect * 100 / questions.length;
+  return (noCorrect * 100) / questions.length
 }

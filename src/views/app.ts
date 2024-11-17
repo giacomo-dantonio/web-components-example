@@ -2,8 +2,19 @@ import template from "./app.html?raw"
 
 import Session, { isLast } from "../domain/session"
 import { AnswerQuestion, StartSession } from "../domain/events"
-import { capitalize, htmlDecode, interpolateColor, makeOpentdbUrl, questionNr } from "../utils"
-import { QuestionDto, createQuestions, isCorrect, percentScore } from "../domain/question"
+import {
+  capitalize,
+  htmlDecode,
+  interpolateColor,
+  makeOpentdbUrl,
+  questionNr,
+} from "../utils"
+import {
+  QuestionDto,
+  createQuestions,
+  isCorrect,
+  percentScore,
+} from "../domain/question"
 import state from "../state"
 import QuestionForm from "../components/question"
 import QuestionAnswer from "../components/answer"
@@ -75,7 +86,7 @@ class App extends HTMLElement {
       this.state.props = {
         ...this.state.props,
         active_question: Math.min(active_question + 1, questions.length - 1),
-        over: isLast(this.state.props)
+        over: isLast(this.state.props),
       }
     }
   }
@@ -104,18 +115,21 @@ class App extends HTMLElement {
       const background = shadow?.querySelector("#bg")
       if (newprops.over) {
         // set background color
-        const score = percentScore(newprops.questions);
+        const score = percentScore(newprops.questions)
         const bgColor = interpolateColor(0xff0000, 0x00ff00, score)
-        shadow
-          ?.querySelector("#bg")
-          ?.setAttribute("style", `background-color: #${bgColor}`)
+        const background = shadow?.querySelector("#bg")
+        background?.classList.remove("correct", "wrong")
+        background?.setAttribute(
+          "style",
+          `background-image: linear-gradient(to bottom right, #${bgColor}, white);`,
+        )
 
         // render summary
         const summary = document.createElement("game-summary") as GameSummary
         summary.state.props = newprops
 
         contentDiv?.replaceChildren(summary)
-        } else if (newprops.active_question != oldprops?.active_question) {
+      } else if (newprops.active_question != oldprops?.active_question) {
         const question = newprops.questions[newprops.active_question]
         if (question !== undefined) {
           const questionForm = document.createElement(
